@@ -1,0 +1,159 @@
+
+# Enable DPI Awareness in Your Python Script
+import ctypes
+
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)  # 2 = Per-monitor DPI aware
+except Exception:
+    pass
+
+# main app
+
+import wx
+import json
+
+from google.protobuf.json_format import Parse, ParseError
+from phenopackets import Phenopacket
+
+
+karyotype_choices = [
+    "UNKNOWN_KARYOTYPE",
+    "XX",
+    "XY",
+    "XO",
+    "XXY",
+    "XXX",
+    "XXYY",
+    "XXXY",
+    "XXXX",
+    "XYY",
+    "OTHER_KARYOTYPE"
+]
+
+class PhenopacketEditor(wx.Frame):
+    def __init__(self, parent, title):
+        super().__init__(parent, title=title, size=(600, 500))
+        self.panel = wx.Panel(self)
+        self.json_data = {}
+        self.file_path = None
+
+        # Layout
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        # File controls
+        hbox_file = wx.BoxSizer(wx.HORIZONTAL)
+        self.open_btn = wx.Button(self.panel, label='Open JSON')
+        self.save_btn = wx.Button(self.panel, label='Save JSON')
+        hbox_file.Add(self.open_btn, flag=wx.RIGHT, border=5)
+        hbox_file.Add(self.save_btn)
+        vbox.Add(hbox_file, flag=wx.ALL, border=10)
+
+        # Subject fields
+        self.subject_id = wx.TextCtrl(self.panel)
+        self.subject_sex = wx.TextCtrl(self.panel)
+
+        self.karyotype_choice = wx.Choice(self.panel, choices=karyotype_choices)
+        
+
+
+        self.subject_dob = wx.TextCtrl(self.panel)
+        grid = wx.FlexGridSizer(4, 2, 10, 10)
+
+        grid.AddMany([
+            (wx.StaticText(self.panel, label="Subject ID:"), 0, wx.ALIGN_CENTER_VERTICAL),
+            (self.subject_id, 1, wx.EXPAND),
+            (wx.StaticText(self.panel, label="Sex:"), 0, wx.ALIGN_CENTER_VERTICAL),
+            (self.subject_sex, 1, wx.EXPAND),
+            (wx.StaticText(self.panel, label="Karyotypic Sex:"), 0, wx.ALIGN_CENTER_VERTICAL),
+            (self.karyotype_choice, 1, wx.EXPAND),
+            (wx.StaticText(self.panel, label="Date of Birth:"), 0, wx.ALIGN_CENTER_VERTICAL),
+            (self.subject_dob, 1, wx.EXPAND),
+        ])
+
+
+
+
+        grid.AddGrowableCol(1, 1)
+        vbox.Add(grid, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+        # Phenotypic features
+        vbox.Add(wx.StaticText(self.panel, label="Phenotypic Features (comma-separated HPO labels):"), flag=wx.LEFT | wx.TOP, border=10)
+        self.phenos = wx.TextCtrl(self.panel, style=wx.TE_MULTILINE, size=(-1, 60))
+        vbox.Add(self.phenos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+        # Metadata
+        vbox.Add(wx.StaticText(self.panel, label="Created By:"), flag=wx.LEFT | wx.TOP, border=10)
+        self.created_by = wx.TextCtrl(self.panel)
+        vbox.Add(self.created_by, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+        self.panel.SetSizer(vbox)
+
+        # Bind events
+        self.open_btn.Bind(wx.EVT_BUTTON, self.on_open)
+        self.save_btn.Bind(wx.EVT_BUTTON, self.on_save)
+
+    def on_open(self, event):
+        with wx.FileDialog(self, "Open Phenopacket JSON", wildcard="JSON files (*.json)|*.json",
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dlg:
+            if dlg.ShowModal() == wx.ID_OK:
+                self.file_path = dlg.GetPath()
+                with open(self.file_path, 'r') as f:
+                    self.json_data = json.load(f)
+                self.populate_fields()
+
+    def populate_fields(self):
+        subj = self.json_data.get('subject', {})
+        self.subject_id.SetValue(subj.get('id', ''))
+        self.subject_sex.SetValue(subj.get('sex', ''))
+        if subj.get('karyotypic_sex', '') in karyotype_choices:
+            self.karyotype_choice.SetStringSelection(subj.get('karyotypic_sex', ''))
+        else:
+            self.karyotype_choice.SetSelection(0)  # Default to first option,
+        self.subject_dob.SetValue(subj.get('date_of_birth', ''))
+        phenos = self.json_data.get('phenotypicFeatures', [])
+        pheno_labels = ', '.join([p.get('type', {}).get('label', '') for p in phenos])
+        self.phenos.SetValue(pheno_labels)
+        meta = self.json_data.get('metaData', {})
+        self.created_by.SetValue(meta.get('createdBy', ''))
+
+
+
+
+
+    def on_save(self, event):
+        # Update JSON data from fields (as before)
+        self.json_data['subject'] = {
+            'id': self.subject_id.GetValue(),
+            'sex': self.subject_sex.GetValue(),
+            'karyotypic_sex': self.karyotype_choice.GetStringSelection(),
+            'date_of_birth': self.subject_dob.GetValue()
+        }
+        pheno_labels = [label.strip() for label in self.phenos.GetValue().split(',') if label.strip()]
+        self.json_data['phenotypicFeatures'] = [
+            {'type': {'label': label}} for label in pheno_labels
+        ]
+        if 'metaData' not in self.json_data:
+            self.json_data['metaData'] = {}
+        self.json_data['metaData']['createdBy'] = self.created_by.GetValue()
+
+        # --- Protobuf Validation Step ---
+        try:
+            # Convert dict to JSON string for Parse
+            json_str = json.dumps(self.json_data)
+            phenopacket = Parse(json_str, Phenopacket())
+            # If no exception, validation passed
+        except ParseError as e:
+            wx.MessageBox(f"Validation error: {e}", "Invalid Phenopacket", wx.OK | wx.ICON_ERROR)
+            return  # Do not proceed to save
+
+        # Save to file if valid
+        if self.file_path:
+            with open(self.file_path, 'w') as f:
+                json.dump(self.json_data, f, indent=2)
+            wx.MessageBox("File saved!", "Success", wx.OK | wx.ICON_INFORMATION)
+
+if __name__ == '__main__':
+    app = wx.App(False)
+    frame = PhenopacketEditor(None, "Phenopacket JSON Editor")
+    frame.Show()
+    app.MainLoop()
