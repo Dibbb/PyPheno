@@ -1,0 +1,36 @@
+{
+  "id": "phenopacket-male-infertility-001",
+  "subject": {
+    "id": "patient-001",
+    "sex": "MALE",
+    "karyotypic_sex":"XY",
+    "date_of_birth":"1980-01-01T00:00:00Z"
+  },
+  "phenotypicFeatures": [
+    {
+      "type": {
+        "id": "HP:0003251",
+        "label": "Decreased male fertility"
+      }
+    },
+       {
+      "type": {
+        "id": "HP:0000027",
+        "label": "Azoospermia"
+      }
+    }
+  ],
+  "metaData": {
+    "createdBy": "JD",
+    "created": "2025-07-04T23:40:00+02:00",
+    "resources": [
+      {
+        "id": "hp",
+        "name": "Human Phenotype Ontology",
+        "namespacePrefix": "HP",
+        "url": "http://purl.obolibrary.org/obo/hp.owl",
+        "version": "2024-06-01"
+      }
+    ]
+  }
+}

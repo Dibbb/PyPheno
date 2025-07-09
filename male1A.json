@@ -1,0 +1,54 @@
+{
+  "id": "phenopacket-male-infertility-001",
+  "subject": {
+    "id": "patient-001",
+    "sex": "OTHER_SEX",
+    "karyotypic_sex": "XY",
+    "date_of_birth": "1980-10-10T00:00:00Z"
+  },
+  "phenotypicFeatures": [
+    {
+      "type": {
+        "id": "HP:0000030",
+        "label": "Cryptozoospermia"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0000034",
+        "label": "Oligoasthenoteratozoospermia"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0000032",
+        "label": "Globozoospermia"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0012245",
+        "label": "Sex reversal"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0031438",
+        "label": "Abnormal sex hormone-binding globulin level"
+      }
+    }
+  ],
+  "metaData": {
+    "createdBy": "JD",
+    "created": "2025-07-04T23:40:00+02:00",
+    "resources": [
+      {
+        "id": "hp",
+        "name": "Human Phenotype Ontology",
+        "namespacePrefix": "HP",
+        "url": "http://purl.obolibrary.org/obo/hp.owl",
+        "version": "2024-06-01"
+      }
+    ]
+  }
+}
