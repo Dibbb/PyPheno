@@ -2,9 +2,9 @@
   "id": "phenopacket-male-infertility-001",
   "subject": {
     "id": "patient-001",
-    "sex": "OTHER_SEX",
+    "sex": "MALE",
     "karyotypic_sex": "XY",
-    "date_of_birth": "1989-10-10T00:00:00Z"
+    "date_of_birth": "1985-10-10T00:00:00Z"
   },
   "phenotypicFeatures": [
     {
@@ -35,6 +35,18 @@
       "type": {
         "id": "HP:0031438",
         "label": "Abnormal sex hormone-binding globulin level"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0031226",
+        "label": "Perinephric fluid collection"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:6000248",
+        "label": "Bursa fluid crystals"
       }
     }
   ],

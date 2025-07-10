@@ -322,20 +322,12 @@ class PhenopacketEditor(wx.Frame):
             dob_str = ""
 
 
-
-
-
         self.json_data['subject'] = {
             'id': self.subject_id.GetValue(),
             'sex': self.subject_sex.GetStringSelection(),
             'karyotypic_sex': self.karyotype_choice.GetStringSelection(),
             'date_of_birth': dob_str
         }
-
-
-
-
-
 
         # Phenotypic features
         features = []
@@ -357,11 +349,24 @@ class PhenopacketEditor(wx.Frame):
             wx.MessageBox(f"Validation error: {e}", "Invalid Phenopacket", wx.OK | wx.ICON_ERROR)
             return
 
-        # Save to file if valid
-        if self.file_path:
-            with open(self.file_path, 'w') as f:
-                json.dump(self.json_data, f, indent=2)
-            wx.MessageBox("File saved!", "Success", wx.OK | wx.ICON_INFORMATION)
+        # If no file was opened, prompt for Save As
+        if not self.file_path:
+            with wx.FileDialog(
+                self,
+                 "Save Phenopacket JSON",
+                wildcard="JSON files (*.json)|*.json",
+                style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+
+            ) as dlg:
+                if dlg.ShowModal() == wx.ID_OK:
+                    self.file_path = dlg.GetPath()
+                else:
+                    # User cancelled Save As
+                    return
+
+        with open(self.file_path, 'w') as f:
+            json.dump(self.json_data, f, indent=2)
+        wx.MessageBox("File saved!", "Success", wx.OK | wx.ICON_INFORMATION)
 
 if __name__ == '__main__':
     app = wx.App(False)

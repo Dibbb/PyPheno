@@ -1,0 +1,31 @@
+{
+  "subject": {
+    "id": "dd",
+    "sex": "UNKNOWN_SEX",
+    "karyotypic_sex": "XO",
+    "date_of_birth": "1990-01-01T00:00:00Z"
+  },
+  "phenotypicFeatures": [
+    {
+      "type": {
+        "id": "HP:0012245",
+        "label": "Sex reversal"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0040292",
+        "label": "Left hemiplegia"
+      }
+    },
+    {
+      "type": {
+        "id": "HP:0031295",
+        "label": "Left atrial enlargement"
+      }
+    }
+  ],
+  "metaData": {
+    "createdBy": "JD"
+  }
+}
