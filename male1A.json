@@ -4,7 +4,7 @@
     "id": "patient-001",
     "sex": "OTHER_SEX",
     "karyotypic_sex": "XY",
-    "date_of_birth": "1980-10-10T00:00:00Z"
+    "date_of_birth": "1989-10-10T00:00:00Z"
   },
   "phenotypicFeatures": [
     {

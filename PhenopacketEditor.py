@@ -1,5 +1,4 @@
-#imports-----
-# test github
+#region imports
 import ctypes
 import wx
 import wx.adv
@@ -9,6 +8,9 @@ import json
 import locale
 import datetime
 import sys
+from babel.dates import format_date
+from babel.dates import parse_date
+
 
 from google.protobuf.json_format import Parse, ParseError
 from phenopackets import Phenopacket
@@ -17,6 +19,9 @@ try:
     ctypes.windll.shcore.SetProcessDpiAwareness(2)
 except Exception:
     pass
+
+#endregion
+
 
 KARYOTYPE_CHOICES = [
     "UNKNOWN_KARYOTYPE",
@@ -240,26 +245,11 @@ class PhenopacketEditor(wx.Frame):
         else:
             self.karyotype_choice.SetSelection(0)
 
-
-            import datetime
-
         dob_str = subj.get('date_of_birth', '')
-        if dob_str:
-            try:
-                # Parse the full ISO 8601 format with time and 'Z'
-            
-                dob = datetime.datetime.strptime(dob_str, "%Y-%m-%dT%H:%M:%SZ").date()
-                # Format for locale display
-             
-                locale.setlocale(locale.LC_TIME, '')
-                formatted = dob.strftime(locale.nl_langinfo(locale.D_FMT))
-                self.subject_dob.SetValue(formatted)
-            except Exception:
-                self.subject_dob.SetValue('')
-        else:
-            self.subject_dob.SetValue('')
-
-        
+        dob = datetime.datetime.strptime(dob_str, "%Y-%m-%dT%H:%M:%SZ").date()
+        formatted = format_date(dob, locale='cs')
+        self.subject_dob.SetValue(formatted)
+                
         # Phenotypic features
         self.pheno_list.DeleteAllItems()
         phenos = self.json_data.get('phenotypicFeatures', [])
@@ -319,18 +309,19 @@ class PhenopacketEditor(wx.Frame):
         # Update JSON data from fields
 
 
-
-        dob_input = self.subject_dob.GetValue().strip()
-        if dob_input:
+        user_input = self.subject_dob.GetValue().strip()  # e.g., '10. 10. 1980'
+        if user_input:
             try:
-                # Parse according to your expected format, e.g., YYYY-MM-DD
-                import datetime
-                dob = datetime.datetime.strptime(dob_input, "%Y-%m-%d")
-                dob_str = dob.strftime("%Y-%m-%dT00:00:00Z")  # Save in ISO format with time and timezone
-            except ValueError:
-                dob_str = ""  # Or handle invalid input appropriately
+                # Parse using the Czech locale
+                dob = parse_date(user_input, locale='cs')
+                # Convert to ISO 8601 timestamp for Phenopacket
+                dob_str = dob.strftime("%Y-%m-%dT00:00:00Z")
+            except Exception:
+                dob_str = ""  # Handle invalid input appropriately
         else:
             dob_str = ""
+
+
 
 
 
