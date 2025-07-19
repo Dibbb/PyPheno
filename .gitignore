@@ -1,0 +1,16 @@
+build/PhenopacketEditor/Analysis-00.toc
+build/PhenopacketEditor/base_library.zip
+build/PhenopacketEditor/EXE-00.toc
+build/PhenopacketEditor/PhenopacketEditor.pkg
+build/PhenopacketEditor/PKG-00.toc
+build/PhenopacketEditor/PYZ-00.pyz
+build/PhenopacketEditor/PYZ-00.toc
+build/PhenopacketEditor/warn-PhenopacketEditor.txt
+build/PhenopacketEditor/xref-PhenopacketEditor.html
+build/PhenopacketEditor/localpycs/pyimod01_archive.pyc
+build/PhenopacketEditor/localpycs/pyimod02_importers.pyc
+build/PhenopacketEditor/localpycs/pyimod03_ctypes.pyc
+build/PhenopacketEditor/localpycs/pyimod04_pywin32.pyc
+build/PhenopacketEditor/localpycs/struct.pyc
+dist/PhenopacketEditor.exe
+male2.json
